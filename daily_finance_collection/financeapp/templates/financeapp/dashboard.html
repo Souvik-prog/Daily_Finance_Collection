@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            padding: 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .content h1 {
+            margin-top: 0;
+        }
+        .dashboard-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .box {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 45%;
+            margin: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .box a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .box a:hover {
+            text-decoration: underline;
+        }
+        .box.total-employees {
+            background-color: #28a745;
+        }
+        .box.total-customers {
+            background-color: #dc3545;
+        }
+        .box:hover {
+            background-color: #0056b3;
+        }
+        .box.total-employees:hover {
+            background-color: #218838;
+        }
+        .box.total-customers:hover {
+            background-color: #c82333;
+        }
+        .taskbar {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: calc(100% - 250px);
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+        .taskbar .contact-info {
+            text-align: right;
+        }
+        .taskbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .taskbar p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div>
+            <h1>Mondal Enterprises</h1>
+            <p id="current-date"></p>
+        </div>
+        <div class="contact-info">
+            <p>Contact: +91 8697665259, +91 9062085503</p>
+            <p>Address: Santoshpur, West Bengal-700125</p>
+        </div>
+    </div>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'add_customer' %}">Add Customers</a>
+        <a href="{% url 'customers_list' %}">Customers List</a>
+        <a href="{% url 'add_employee' %}">Add Employees</a>
+        <a href="{% url 'employees_list' %}">Employees List</a>
+        <a href="{% url 'daily_transactions' %}">Daily Transactions</a>
+        <a href="{% url 'assign_employee' %}">Assign Employee</a>
+        <a href="{% url 'daily_cash_entry' %}">Daily Cash Entry</a>
+        <a href="{% url 'daily_cash' %}">Daily Cash</a>
+        <a href="{% url 'customers_update_data' %}">Customers Update Data</a>
+        <a href="{% url 'customers_payment_history' %}">Customers Payment History</a>
+        <a href="{% url 'data_backup' %}">Data Backup</a>
+    </div>
+    <div class="content">
+        <h1>Dashboard</h1>
+        <div class="dashboard-boxes">
+            <div class="box total-employees">
+                <a href="{% url 'employees_list' %}">
+                    <p>Total Employees: {{ total_employees }}</p>
+                </a>
+            </div>
+            <div class="box total-customers">
+                <a href="{% url 'customers_list' %}">
+                    <p>Total Customers: {{ total_customers }}</p>
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-boxes">
+            <div class="box">
+                <p>Opening Balance: Rs <span id="opening-balance">{{ opening_balance }}</span></p>
+                <!--button class="btn btn-light" data-toggle="modal" data-target="#editOpeningBalanceModal">Edit</button-->
+            </div>
+            <div class="box">
+                <p>Closing Balance: Rs {{ closing_balance }}</p>
+            </div>
+        </div>
+        <div class="dashboard-boxes">
+            <div class="box">
+                <p>Total Opening Outstand: Rs {{ total_opening_outstand }}</p>
+            </div>
+            <div class="box">
+                <p>Total Closing Outstand: Rs {{ total_closing_outstand }}</p>
+            </div>
+        </div>
+        <div class="dashboard-boxes">
+            <div class="box">
+                <p>Daily Collection Amount: Rs {{ daily_collection }}</p>
+            </div>
+            <div class="box">
+                <p>Total Paid Amount: Rs {{ total_paid_amount }}</p>
+            </div>
+        </div>
+        <div class="dashboard-boxes">
+            <div class="box">
+                <p>Total NPA Amount: Rs {{ total_npa_amount }}</p>
+            </div>
+            <!--div class="box">
+                <p>Total Market Cash: Rs {{ total_market_cash }}</p>
+            </div-->
+        </div>
+        <div class="form-group">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" name="mark_holiday" onclick="return confirmHoliday()">Mark Tomorrow as Holiday</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="editOpeningBalanceModal" tabindex="-1" role="dialog" aria-labelledby="editOpeningBalanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOpeningBalanceModalLabel">Edit Opening Balance</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="edit-opening-balance-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="new-opening-balance">New Opening Balance</label>
+                            <input type="number" class="form-control" id="new-opening-balance" name="new_opening_balance" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+
+        function confirmHoliday() {
+            return confirm("Are you sure you want to mark tomorrow as a holiday? This will extend the closing date of all active customers by one day.");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Employee</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container-fluid {
+            margin-top: 0px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group.col-md-6 {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.col-md-6.right {
+            align-items: flex-start;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            padding: 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .content {
+            margin-left: 0px; /* Adjusted to match sidebar width and padding */
+        }
+        .taskbar {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: 84%;
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+        .taskbar .contact-info {
+            text-align: right;
+        }
+        .taskbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .taskbar p {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div>
+            <h1>Mondal Enterprises</h1>
+            <p id="current-date"></p>
+        </div>
+        <div class="contact-info">
+            <p>Contact: +91 8697665259, +91 9062085503</p>
+            <p>Address: Santoshpur, West Bengal-700125</p>
+        </div>
+    </div>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'add_customer' %}">Add Customers</a>
+            <a href="{% url 'customers_list' %}">Customers List</a>
+            <a href="{% url 'add_employee' %}">Add Employees</a>
+            <a href="{% url 'employees_list' %}">Employees List</a>
+            <a href="{% url 'daily_transactions' %}">Daily Transactions</a>
+            <a href="{% url 'assign_employee' %}">Assign Employee</a>
+            <a href="{% url 'daily_cash_entry' %}">Daily Cash Entry</a>
+            <a href="{% url 'daily_cash' %}">Daily Cash</a>
+            <a href="{% url 'customers_update_data' %}">Customers Update Data</a>
+            <a href="{% url 'customers_payment_history' %}">Customers Payment History</a>
+            <a href="{% url 'data_backup' %}">Data Backup</a>
+        </div>
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <h2 class="card-title text-center">Edit Employee</h2>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="id_first_name">First Name</label>
+                                        {{ form.first_name }}
+                                    </div>
+                                    <div class="form-group col-md-6 right">
+                                        <label for="id_last_name">Last Name</label>
+                                        {{ form.last_name }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="id_email">Email</label>
+                                        {{ form.email }}
+                                    </div>
+                                    <div class="form-group col-md-6 right">
+                                        <label for="id_phone_number">Phone Number</label>
+                                        {{ form.phone_number }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="id_empid">Employee ID</label>
+                                        {{ form.empid }}
+                                    </div>
+                                    <div class="form-group col-md-6 right">
+                                        <label for="id_password">Password</label>
+                                        {{ form.password }}
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

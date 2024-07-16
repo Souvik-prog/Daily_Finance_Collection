@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Updated Data</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container-fluid {
+            margin-top: 50px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            padding: 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .content {
+            margin-left: 0px;
+            width: calc(100% - 250px);
+        }
+        .taskbar {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: 84%;
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+        .taskbar .contact-info {
+            text-align: right;
+        }
+        .taskbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .taskbar p {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div>
+            <h1>Mondal Enterprises</h1>
+            <p id="current-date"></p>
+        </div>
+        <div class="contact-info">
+            <p>Contact: +91 8697665259, +91 9062085503</p>
+            <p>Address: Santoshpur, West Bengal-700125</p>
+        </div>
+    </div>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'add_customer' %}">Add Customers</a>
+            <a href="{% url 'customers_list' %}">Customers List</a>
+            <a href="{% url 'add_employee' %}">Add Employees</a>
+            <a href="{% url 'employees_list' %}">Employees List</a>
+            <a href="{% url 'daily_transactions' %}">Daily Transactions</a>
+            <a href="{% url 'assign_employee' %}">Assign Employee</a>
+            <a href="{% url 'daily_cash_entry' %}">Daily Cash Entry</a>
+            <a href="{% url 'daily_cash' %}">Daily Cash</a>
+            <a href="{% url 'customers_update_data' %}">Customers Update Data</a>
+            <a href="{% url 'customers_payment_history' %}">Customers Payment History</a>
+            <a href="{% url 'data_backup' %}">Data Backup</a>
+        </div>
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <h2 class="card-title text-center">Customer Updated Data</h2>
+                            <form method="get" action="{% url 'customers_update_data' %}">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="selected_date">Select Date</label>
+                                        <input type="date" class="form-control" id="selected_date" name="selected_date" value="{{ selected_date }}">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <button type="submit" class="btn btn-primary">Apply Search</button>
+                                        <button type="reset" class="btn btn-secondary">Reset</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label for="entries" class="mr-2">Show entries:</label>
+                                <select id="entries" class="form-control w-auto">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <form method="get" action="{% url 'export_csv' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                                    <!--button type="submit" class="btn btn-success">Export to CSV</button-->
+                                </form>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>SR No.</th>
+                                            <th>Customer Number</th>
+                                            <th>Customer Name</th>
+                                            <th>Customer Phone Number</th>
+                                            <th>EMI</th>
+                                            <th>Closing Date</th>
+                                            <th>EMI Due</th>
+                                            <th>Balance Due</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for customer in customers %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ customer.customer_number }}</td>
+                                            <td>{{ customer.first_name }} {{ customer.last_name }}</td>
+                                            <td>{{ customer.phone_number }}</td>
+                                            <td>{{ customer.per_day_emi }}</td>
+                                            <td>{{ customer.closing_date }}</td>
+                                            <td>{{ customer.emi_due }}</td>
+                                            <td>{{ customer.balance_due }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="mt-3">
+                                    <strong>Active Loans Count:</strong> {{ active_loans_count }}
+                                </div>
+                            </div>
+                            <div class="pagination">
+                                <nav>
+                                    <ul class="pagination">
+                                        {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&selected_date={{ selected_date }}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                                        </li>
+                                        {% endif %}
+
+                                        {% for num in page_obj.paginator.page_range %}
+                                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                            <a class="page-link" href="?page={{ num }}&selected_date={{ selected_date }}">{{ num }}</a>
+                                        </li>
+                                        {% endfor %}
+
+                                        {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&selected_date={{ selected_date }}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

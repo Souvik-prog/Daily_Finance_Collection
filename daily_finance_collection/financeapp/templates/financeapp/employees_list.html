@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 80px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            padding: 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .content {
+            margin-left: 0px;
+        }
+        .taskbar {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: 84%;
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+        .taskbar .contact-info {
+            text-align: right;
+        }
+        .taskbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .taskbar p {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div>
+            <h1>Mondal Enterprises</h1>
+            <p id="current-date"></p>
+        </div>
+        <div class="contact-info">
+            <p>Contact: +91 8697665259, +91 9062085503</p>
+            <p>Address: Santoshpur, West Bengal-700125</p>
+        </div>
+    </div>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'add_customer' %}">Add Customers</a>
+            <a href="{% url 'customers_list' %}">Customers List</a>
+            <a href="{% url 'add_employee' %}">Add Employees</a>
+            <a href="{% url 'employees_list' %}">Employees List</a>
+            <a href="{% url 'daily_transactions' %}">Daily Transactions</a>
+            <a href="{% url 'assign_employee' %}">Assign Employee</a>
+            <a href="{% url 'daily_cash_entry' %}">Daily Cash Entry</a>
+            <a href="{% url 'daily_cash' %}">Daily Cash</a>
+            <a href="{% url 'customers_update_data' %}">Customers Update Data</a>
+            <a href="{% url 'customers_payment_history' %}">Customers Payment History</a>
+            <a href="{% url 'data_backup' %}">Data Backup</a>
+        </div>
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Employees List</h1>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label for="entries" class="mr-2">Show entries:</label>
+                            <select id="entries" class="form-control w-auto">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>EmpID</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>Phone Number</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for employee in employees %}
+                                    <tr>
+                                        <td>{{ employee.empid }}</td>
+                                        <td>{{ employee.first_name }}</td>
+                                        <td>{{ employee.last_name }}</td>
+                                        <td>{{ employee.email }}</td>
+                                        <td>{{ employee.phone_number }}</td>
+                                        <td>{{ employee.status }}</td>
+                                        <td>
+                                            <a href="{% url 'edit_employee' employee.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="{% url 'delete_employee' employee.id %}" method="post" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this employee?');">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

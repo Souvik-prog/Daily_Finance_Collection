@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Cash Entry</title>
+</head>
+<body>
+    <h1>Daily Cash Entry</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>SR No</th>
+                <th>Phone Number</th>
+                <th>Name</th>
+                <th>Customer Number</th>
+                <th>Loan Amount</th>
+                <th>Outstanding Amount (All)</th>
+                <th>DEA (Per Day EMI)</th>
+                <th>Paid Amount</th>
+                <th>Outstanding Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in loan_details %}
+                <tr>
+                    <td>{{ detail.sr_no }}</td>
+                    <td>{{ detail.customer.phone_number }}</td>
+                    <td>{{ detail.customer.first_name }} {{ detail.customer.last_name }}</td>
+                    <td>{{ detail.customer.customer_number }}</td>
+                    <td>{{ detail.customer.loan_amount }}</td>
+                    <td>{{ detail.opening_outstand }}</td>
+                    <td>{{ detail.dea }}</td>
+                    <td>{{ detail.paid_amount }}</td>
+                    <td>{{ detail.outstanding_amount }}</td>
+                    <td><a href="{% url 'update_paid_amount' detail.id %}">Update Paid Amount</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{% url 'generate_daily_csv' %}">Download CSV</a>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Transactions</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .taskbar {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .taskbar .contact-info {
+            text-align: right;
+        }
+        .taskbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .taskbar p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: calc(100vh - 60px);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 80px 20px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div>
+            <h1>Mondal Enterprises</h1>
+            <p id="current-date"></p>
+        </div>
+        <div class="contact-info">
+            <p>Contact: +91 8697665259, +91 9062085503</p>
+            <p>Address: Santoshpur, West Bengal-700125</p>
+        </div>
+    </div>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'add_customer' %}">Add Customers</a>
+        <a href="{% url 'customers_list' %}">Customers List</a>
+        <a href="{% url 'add_employee' %}">Add Employees</a>
+        <a href="{% url 'employees_list' %}">Employees List</a>
+        <a href="{% url 'daily_transactions' %}">Daily Transactions</a>
+        <a href="{% url 'assign_employee' %}">Assign Employee</a>
+        <a href="{% url 'daily_cash_entry' %}">Daily Cash Entry</a>
+        <a href="{% url 'daily_cash' %}">Daily Cash</a>
+        <a href="{% url 'customers_update_data' %}">Customers Update Data</a>
+        <a href="{% url 'customers_payment_history' %}">Customers Payment History</a>
+        <a href="{% url 'data_backup' %}">Data Backup</a>
+    </div>
+    <div class="content container-fluid">
+        <h2>Daily Transactions</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        <form method="get" action="{% url 'download_transactions_csv' %}" class="mt-4">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                </div>
+                <div class="form-group col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success">Download CSV</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Opening Balance</th>
+                    <th>Daily Collection</th>
+                    <th>Loan Distribution</th>
+                    <th>Add Cash</th>
+                    <th>Expenses</th>
+                    <th>Closing Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in page_obj %}
+                    <tr>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.opening_balance }}</td>
+                        <td>{{ transaction.daily_collection }}</td>
+                        <td>{{ transaction.loan_distribution }}</td>
+                        <td>{{ transaction.add_cash }}</td>
+                        <td>{{ transaction.expenses }}</td>
+                        <td>{{ transaction.closing_balance }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination controls -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active"><a class="page-link">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    <script>
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+    </script>
+</body>
+</html>

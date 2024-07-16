@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Cash Entry</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #d1d1d1;
+            display: block;
+        }
+        .sidebar a:hover {
+            background-color: #575d63;
+            color: #fff;
+        }
+        .container {
+            margin-top: 50px;
+            margin-left: 270px;
+            max-width: calc(100% - 270px);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        table {
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .taskbar {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: 84%;
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+        .taskbar .contact-info {
+            text-align: right;
+        }
+        .taskbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .taskbar p {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div>
+            <h1>Mondal Enterprises</h1>
+            <p id="current-date"></p>
+        </div>
+        <div class="contact-info">
+            <p>Contact: +91 8697665259, +91 9062085503</p>
+            <p>Address: Santoshpur, West Bengal-700125</p>
+        </div>
+    </div>
+    <div class="sidebar">
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'add_customer' %}">Add Customers</a>
+        <a href="{% url 'customers_list' %}">Customers List</a>
+        <a href="{% url 'add_employee' %}">Add Employees</a>
+        <a href="{% url 'employees_list' %}">Employees List</a>
+        <a href="{% url 'daily_transactions' %}">Daily Transactions</a>
+        <a href="{% url 'assign_employee' %}">Assign Employee</a>
+        <a href="{% url 'daily_cash_entry' %}">Daily Cash Entry</a>
+        <a href="{% url 'daily_cash' %}">Daily Cash</a>
+        <a href="{% url 'customers_update_data' %}">Customers Update Data</a>
+        <a href="{% url 'customers_payment_history' %}">Customers Payment History</a>
+        <a href="{% url 'data_backup' %}">Data Backup</a>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center">Daily Cash Entry</h1>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">SR No</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Customer Number</th>
+                    <th scope="col">Loan Amount</th>
+                    <th scope="col">Outstanding Amount (All)</th>
+                    <th scope="col">DEA (Per Day EMI)</th>
+                    <th scope="col">Daily Collection Amount</th>
+                    <th scope="col">Paid Amount</th>
+                    <th scope="col">Outstanding Amount</th>
+                    <th scope="col">Balance Amount</th>
+                    <th scope="col">Employee</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in page_obj %}
+                    <tr id="loan-detail-{{ detail.id }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ detail.customer.phone_number }}</td>
+                        <td>{{ detail.customer.first_name }} {{ detail.customer.last_name }}</td>
+                        <td>{{ detail.customer.customer_number }}</td>
+                        <td>{{ detail.customer.loan_amount }}</td>
+                        <td>{{ detail.opening_outstand }}</td>
+                        <td>{{ detail.dea }}</td>
+                        <td>{{ detail.daily_collection_amount }}</td>
+                        <td id="paid-amount-{{ detail.id }}">{{ detail.paid_amount }}</td>
+                        <td id="outstanding-amount-{{ detail.id }}">{{ detail.outstanding_amount }}</td>
+                        <td id="balance-amount-{{ detail.id }}">{{ detail.balance_amount }}</td>
+                        <td>
+                            <select class="form-control employee-dropdown" id="employee-{{ detail.id }}">
+                                <option value="">Select Employee</option>
+                                {% for employee in employees %}
+                                    <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm update-paid-amount" data-id="{{ detail.id }}">Update Paid Amount</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center">
+            <a href="{% url 'generate_daily_csv' %}" class="btn btn-success">Download Daily Collection List</a>
+        </div>
+        <div class="text-center">
+        </br>
+            <a href="{% url 'generate_csv_npa' %}" class="btn btn-success">Download NPA</a>
+        </div>
+        <div class="pagination">
+            <nav>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="updatePaidAmountModal" tabindex="-1" role="dialog" aria-labelledby="updatePaidAmountModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updatePaidAmountModalLabel">Update Paid Amount</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="updatePaidAmountForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="paidAmount">Paid Amount</label>
+                            <input type="number" class="form-control" id="paidAmount" name="paid_amount" required>
+                        </div>
+                        <input type="hidden" id="loanDetailId" name="loan_detail_id">
+                        <input type="hidden" id="employeeId" name="employee_id">
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Open modal on button click and populate it with current paid amount
+            $('.update-paid-amount').click(function() {
+                var loanDetailId = $(this).data('id');
+                var currentPaidAmount = $('#paid-amount-' + loanDetailId).text();
+                var selectedEmployeeId = $('#employee-' + loanDetailId).val();
+                $('#loanDetailId').val(loanDetailId);
+                $('#paidAmount').val(currentPaidAmount);
+                $('#employeeId').val(selectedEmployeeId);
+                $('#updatePaidAmountModal').modal('show');
+            });
+
+            // Handle form submission
+            $('#updatePaidAmountForm').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "update_paid_amount" %}',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            var loanDetailId = $('#loanDetailId').val();
+                            $('#paid-amount-' + loanDetailId).text(response.updated_data.paid_amount);
+                            $('#outstanding-amount-' + loanDetailId).text(response.updated_data.outstanding_amount);
+                            $('#balance-amount-' + loanDetailId).text(response.updated_data.balance_amount);
+                            $('#updatePaidAmountModal').modal('hide');
+                        } else {
+                            alert(response.message);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
